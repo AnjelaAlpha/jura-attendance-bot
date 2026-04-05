@@ -1,4 +1,0 @@
-aiogram[fast]
-fastapi
-uvicorn[standard]
-python-dotenv
