@@ -1,38 +1,32 @@
 import os
 from fastapi import FastAPI, Request
 from aiogram import Bot, Dispatcher, F
-from aiogram.types import Message
+from aiogram.types import Update, Message
 from aiogram.filters import Command
-from aiogram.webhook import types as whtypes
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application  # aiogram 3.x
+import asyncio
 import uvicorn
-from dotenv import load_dotenv
 
 load_dotenv()
 app = FastAPI()
 TOKEN = os.getenv('BOT_TOKEN')
-if not TOKEN:
-    raise ValueError("BOT_TOKEN required!")
-
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start(msg: Message):
-    await msg.answer("🪖 Джурі Attendance Bot!\n/mark — відмітка\n/view — списки")
+    await msg.answer("🪖 Джурі Bot онлайн!\n/mark — відмітка")
 
 @dp.message(Command("mark"))
 async def mark(msg: Message):
-    await msg.answer("🔒 Введіть пароль: 280911")
+    await msg.answer("🔒 Пароль: 280911")
 
-@app.post(f"/webhook/bot{TOKEN}")
-async def webhook(request: Request):
-    update = whtypes.Update(**await request.json())
-    await dp.feed_update(bot, update)
-    return {"ok": True}
+SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=f"/webhook/bot{TOKEN}")
+setup_application(app, dp, bot=bot)
 
 @app.get("/")
 async def root():
-    return {"status": "Jura Bot ready 🚀"}
+    return {"status": f"Jura Bot v1 (aiogram 3.x) 🚀"}
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 10000))
