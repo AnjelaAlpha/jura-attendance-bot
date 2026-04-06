@@ -114,5 +114,7 @@ async def root():
     return {"status": "Jura Attendance Bot FULL READY 🚀", "features": "marking, multi-select, roys"}
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 10000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    print(f"🚀 Starting on PORT {port}")  # Render logs
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info"
